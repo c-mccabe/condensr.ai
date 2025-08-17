@@ -20,7 +20,7 @@ twilio_whatsapp = "whatsapp:+14155238886"
 client = Client(account_sid, auth_token)
 
 # Public Render URL
-PUBLIC_URL = None
+PUBLIC_URL = "https://condensr-ai.onrender.com"
 
 
 @app.post("/whatsapp")
