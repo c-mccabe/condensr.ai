@@ -34,7 +34,7 @@ async def whatsapp_webhook(
         return "No media file received"
 
     # Download WhatsApp audio into memory
-    r = requests.get(MediaUrl0)
+    r = requests.get(MediaUrl0, auth=(account_sid, auth_token))
     input_audio = r.content  # raw bytes
 
     # Print content-type header from Twilio
