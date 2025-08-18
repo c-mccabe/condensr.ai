@@ -35,53 +35,30 @@ if not ELEVENLABS_API_KEY:
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# Use imageio-ffmpeg’s embedded ffmpeg (no system install needed)
-FFMPEG_BIN = imageio_ffmpeg.get_ffmpeg_exe()
+def _detect_audio_type(audio_bytes: bytes) -> str:
+    header = audio_bytes[:16]
+    if header.startswith(b"OggS"):
+        return "ogg/opus"
+    elif header[4:8] == b"ftyp":
+        return "mp4/m4a"
+    elif header[:2] == b"ID":
+        return "mp3"
+    else:
+        return "unknown"
 
 
-def _convert_to_wav_bytes(input_audio_bytes: bytes) -> bytes:
+
+def _transcribe_audio(audio_bytes: bytes) -> str:
     """
-    Convert arbitrary audio bytes (e.g., WhatsApp .ogg/.opus) to mono 16k WAV,
-    fully in memory, using imageio-ffmpeg's ffmpeg binary.
+    Send raw WhatsApp audio bytes (ogg/opus) directly to Whisper.
     """
-    # We'll stream bytes into ffmpeg via stdin and capture WAV from stdout
-    # Command: ffmpeg -i pipe:0 -ac 1 -ar 16000 -f wav pipe:1
-    cmd = [
-        FFMPEG_BIN,
-        "-hide_banner",
-        "-loglevel", "error",
-        "-y",
-        "-i", "pipe:0",
-        "-ac", "1",
-        "-ar", "16000",
-        "-f", "wav",
-        "pipe:1",
-    ]
-
-    proc = subprocess.Popen(
-        cmd,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    out, err = proc.communicate(input=input_audio_bytes)
-
-    if proc.returncode != 0 or not out:
-        raise RuntimeError(f"ffmpeg conversion failed: {err.decode('utf-8', 'ignore')}")
-    return out
-
-
-def _transcribe_wav(wav_bytes: bytes) -> str:
-    """
-    Send WAV bytes to Whisper for transcription.
-    """
-    wav_io = io.BytesIO(wav_bytes)
-    wav_io.name = "audio.wav"  # OpenAI SDK may inspect .name for MIME
-    wav_io.seek(0)
+    audio_io = io.BytesIO(audio_bytes)
+    audio_io.name = "audio.ogg"  # helps SDK detect format
+    audio_io.seek(0)
 
     resp = client.audio.transcriptions.create(
         model="whisper-1",
-        file=wav_io
+        file=audio_io
     )
     return resp.text
 
@@ -170,17 +147,16 @@ def _elevenlabs_clone_and_tts(summary_text: str, voice_sample_bytes: bytes) -> b
 def summarise_clone_and_replay(input_audio_bytes: bytes, filename: Optional[str] = None) -> bytes:
     """
     End-to-end:
-      1) Convert incoming audio bytes to 16k mono WAV
-      2) Transcribe with Whisper
-      3) Summarise with GPT
-      4) Clone the voice and speak summary with ElevenLabs
+      1) Transcribe with Whisper
+      2) Summarise with GPT
+      3) Clone the voice and speak summary with ElevenLabs
     Returns MP3 bytes ready to send back to WhatsApp.
     """
-    # Convert (works for ogg/opus/mp4/mp3/etc.)
-    wav_bytes = _convert_to_wav_bytes(input_audio_bytes)
 
-    # Transcribe
-    transcript = _transcribe_wav(wav_bytes)
+    print("DEBUG audio type:", _detect_audio_type(input_audio_bytes))
+
+    # Transcribe directly (no ffmpeg conversion)
+    transcript = _transcribe_audio(input_audio_bytes)
 
     # Summarise
     summary = _summarise_text(transcript)
