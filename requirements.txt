@@ -5,3 +5,4 @@ requests
 imageio-ffmpeg
 python-multipart
 twilio
+python-dotenv
