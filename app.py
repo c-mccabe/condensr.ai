@@ -37,6 +37,12 @@ async def whatsapp_webhook(
     r = requests.get(MediaUrl0)
     input_audio = r.content  # raw bytes
 
+    # Print content-type header from Twilio
+    print("DEBUG Twilio Content-Type:", r.headers.get("Content-Type"))
+
+    # Print first 32 bytes as hex to inspect file signature
+    print("DEBUG first 32 bytes:", input_audio[:32].hex())
+
     # Run pipeline (returns MP3 bytes)
     output_audio = summarise_clone_and_replay(input_audio)
 
