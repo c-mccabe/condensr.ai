@@ -39,6 +39,8 @@ async def whatsapp_webhook(
 
     # Print content-type header from Twilio
     print("DEBUG Twilio Content-Type:", r.headers.get("Content-Type"))
+    print("DEBUG status code:", r.status_code)
+    print(f"DEBUG (account_sid, auth_token): {(account_sid, auth_token)}")
 
     # Print first 32 bytes as hex to inspect file signature
     print("DEBUG first 32 bytes:", input_audio[:32].hex())
