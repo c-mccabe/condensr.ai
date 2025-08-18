@@ -3,6 +3,7 @@ import os
 import io
 import requests
 from pydub import AudioSegment
+import imageio_ffmpeg
 from dotenv import load_dotenv
 from openai import OpenAI
 

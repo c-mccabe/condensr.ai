@@ -5,4 +5,5 @@ python-dotenv
 requests
 openai
 pydub
+imageio-ffmpeg
 python-multipart
