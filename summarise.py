@@ -57,6 +57,7 @@ def _transcribe_audio(audio_bytes: bytes) -> str:
         model="whisper-1",
         file=audio_io
     )
+    print(resp.text)
     return resp.text
 
 
@@ -118,10 +119,10 @@ def _elevenlabs_clone_and_tts(summary_text: str, voice_sample_bytes: bytes) -> b
         "text": summary_text,
         "model_id": "eleven_multilingual_v2",
         "voice_settings": {
-            "stability": 0.25,
-            "similarity_boost": 1.0,
-            "style": 0.2,
-            "use_speaker_boost": True
+            "stability": 0.7,
+            "similarity_boost": 1,
+            "style": 0.15,
+            "use_speaker_boost": False
         }
     }
 
