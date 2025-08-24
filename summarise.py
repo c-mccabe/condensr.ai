@@ -119,9 +119,9 @@ def _elevenlabs_clone_and_tts(summary_text: str, voice_sample_bytes: bytes) -> b
         "text": summary_text,
         "model_id": "eleven_multilingual_v2",
         "voice_settings": {
-            "stability": 0.7,
+            "stability": 0.85,
             "similarity_boost": 1,
-            "style": 0.15,
+            "style": 0.1,
             "use_speaker_boost": False
         }
     }
