@@ -78,6 +78,7 @@ def _summarise_text(text: str) -> str:
         ],
         temperature=0.3,
     )
+    print(resp.choices[0].message.content.strip())
     return resp.choices[0].message.content.strip()
 
 
@@ -119,9 +120,9 @@ def _elevenlabs_clone_and_tts(summary_text: str, voice_sample_bytes: bytes) -> b
         "text": summary_text,
         "model_id": "eleven_multilingual_v2",
         "voice_settings": {
-            "stability": 0.85,
+            "stability": 0.7,
             "similarity_boost": 1,
-            "style": 0.1,
+            "style": 0.3,
             "use_speaker_boost": True
         }
     }
