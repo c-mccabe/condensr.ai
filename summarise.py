@@ -122,7 +122,7 @@ def _elevenlabs_clone_and_tts(summary_text: str, voice_sample_bytes: bytes) -> b
             "stability": 0.85,
             "similarity_boost": 1,
             "style": 0.1,
-            "use_speaker_boost": False
+            "use_speaker_boost": True
         }
     }
 
