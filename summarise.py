@@ -1,13 +1,9 @@
-# summarise.py
 import os
 import io
 import json
-import subprocess
-import tempfile
 from typing import Optional
 
 import requests
-import imageio_ffmpeg
 from openai import OpenAI
 
 SYSTEM_PROMPT = """
@@ -20,9 +16,10 @@ meet for coffee next week, the summary should be something like:
 Hey! New job is great and the people are lovely (commute is a bit of a pain though). Mum's doing well after the surgery.
 Want to meet for coffee next week?
 
-The tone should be friendly, upbeat but concise and ideally about 3 short sentences along with a greeting at the beginning
+The tone should be friendly, upbeat but concise and ideally about 3 or 4 short sentences along with a greeting at the beginning
 if they offered one originally. If they use particular turns of phrase (oh my god, for real) replicating those would be
-good if they an be worked in naturally.
+good if they an be worked in naturally. If it's a really long message, going to 5 sentences to ensure you capture all of
+the content is fine.
 """
 
 # ---- Config ----
@@ -121,9 +118,9 @@ def _elevenlabs_clone_and_tts(summary_text: str, voice_sample_bytes: bytes) -> b
         "text": summary_text,
         "model_id": "eleven_multilingual_v2",
         "voice_settings": {
-            "stability": 0.6,
+            "stability": 0.25,
             "similarity_boost": 1.0,
-            "style": 0.0,
+            "style": 0.2,
             "use_speaker_boost": True
         }
     }
